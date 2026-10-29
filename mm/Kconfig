@@ -1,9 +1,10 @@
+# SPDX-License-Identifier: GPL-2.0
 
 menu "Memory Management options"
 
 config SELECT_MEMORY_MODEL
 	def_bool y
-	depends on ARCH_SELECT_MEMORY_MODEL
+depends on ARCH_SELECT_MEMORY_MODEL
 
 choice
 	prompt "Memory model"
@@ -66,19 +67,19 @@ endchoice
 
 config DISCONTIGMEM
 	def_bool y
-	depends on (!SELECT_MEMORY_MODEL && ARCH_DISCONTIGMEM_ENABLE) || DISCONTIGMEM_MANUAL
+depends on (!SELECT_MEMORY_MODEL && ARCH_DISCONTIGMEM_ENABLE) || DISCONTIGMEM_MANUAL
 
 config SPARSEMEM
 	def_bool y
-	depends on (!SELECT_MEMORY_MODEL && ARCH_SPARSEMEM_ENABLE) || SPARSEMEM_MANUAL
+depends on (!SELECT_MEMORY_MODEL && ARCH_SPARSEMEM_ENABLE) || SPARSEMEM_MANUAL
 
 config FLATMEM
 	def_bool y
-	depends on (!DISCONTIGMEM && !SPARSEMEM) || FLATMEM_MANUAL
+depends on (!DISCONTIGMEM && !SPARSEMEM) || FLATMEM_MANUAL
 
 config FLAT_NODE_MEM_MAP
 	def_bool y
-	depends on !SPARSEMEM
+depends on !SPARSEMEM
 
 #
 # Both the NUMA code and DISCONTIGMEM use arrays of pg_data_t's
@@ -87,11 +88,11 @@ config FLAT_NODE_MEM_MAP
 #
 config NEED_MULTIPLE_NODES
 	def_bool y
-	depends on DISCONTIGMEM || NUMA
+depends on DISCONTIGMEM || NUMA
 
 config HAVE_MEMORY_PRESENT
 	def_bool y
-	depends on ARCH_HAVE_MEMORY_PRESENT || SPARSEMEM
+depends on ARCH_HAVE_MEMORY_PRESENT || SPARSEMEM
 
 #
 # SPARSEMEM_EXTREME (which is the default) does some bootmem
@@ -113,7 +114,7 @@ config SPARSEMEM_STATIC
 #
 config SPARSEMEM_EXTREME
 	def_bool y
-	depends on SPARSEMEM && !SPARSEMEM_STATIC
+depends on SPARSEMEM && !SPARSEMEM_STATIC
 
 config SPARSEMEM_VMEMMAP_ENABLE
 	bool
@@ -163,7 +164,7 @@ config MEMORY_HOTPLUG
 
 config MEMORY_HOTPLUG_SPARSE
 	def_bool y
-	depends on SPARSEMEM && MEMORY_HOTPLUG
+depends on SPARSEMEM && MEMORY_HOTPLUG
 
 config MEMORY_HOTPLUG_DEFAULT_ONLINE
         bool "Online the newly added memory blocks by default"
@@ -198,10 +199,10 @@ config MEMORY_HOTREMOVE
 #
 config SPLIT_PTLOCK_CPUS
 	int
-	default "999999" if !MMU
-	default "999999" if ARM && !CPU_CACHE_VIPT
-	default "999999" if PARISC && !PA20
-	default "4"
+default "999999" if !MMU
+default "999999" if ARM && !CPU_CACHE_VIPT
+default "999999" if PARISC && !PA20
+default "4"
 
 config ARCH_ENABLE_SPLIT_PMD_PTLOCK
 	bool
@@ -216,7 +217,7 @@ config MEMORY_BALLOON
 config BALLOON_COMPACTION
 	bool "Allow for balloon memory compaction/migration"
 	def_bool y
-	depends on COMPACTION && MEMORY_BALLOON
+depends on COMPACTION && MEMORY_BALLOON
 	help
 	  Memory fragmentation introduced by ballooning might reduce
 	  significantly the number of 2MB contiguous memory blocks that can be
@@ -249,7 +250,7 @@ config COMPACTION
 config MIGRATION
 	bool "Page migration"
 	def_bool y
-	depends on (NUMA || ARCH_ENABLE_MEMORY_HOTREMOVE || COMPACTION || CMA) && MMU
+depends on (NUMA || ARCH_ENABLE_MEMORY_HOTREMOVE || COMPACTION || CMA) && MMU
 	help
 	  Allows the migration of the physical location of pages of processes
 	  while the virtual addresses are not changed. This is useful in
@@ -270,7 +271,7 @@ config PHYS_ADDR_T_64BIT
 config BOUNCE
 	bool "Enable bounce buffers"
 	default y
-	depends on BLOCK && MMU && (ZONE_DMA || HIGHMEM)
+depends on BLOCK && MMU && (ZONE_DMA || HIGHMEM)
 	help
 	  Enable bounce buffers for devices that cannot access
 	  the full range of memory available to the CPU. Enabled
@@ -279,8 +280,8 @@ config BOUNCE
 
 config NR_QUICK
 	int
-	depends on QUICKLIST
-	default "1"
+depends on QUICKLIST
+default "1"
 
 config VIRT_TO_BUS
 	bool
@@ -307,6 +308,26 @@ config KSM
 	  See Documentation/vm/ksm.rst for more information: KSM is inactive
 	  until a program has madvised that an area is MADV_MERGEABLE, and
 	  root has set /sys/kernel/mm/ksm/run to 1 (if CONFIG_SYSFS is set).
+
+config LRU_GEN
+	bool "Multi-gen LRU"
+	depends on MMU
+	depends on MEMCG
+	default y
+	help
+	  Multi-gen LRU is a memory reclamation algorithm that tracks page
+	  aging across generations to reduce reclaim overhead, improve
+	  working set detection, and make memory scanning more efficient.
+	  This option is only available when memory cgroups support is enabled.
+
+config LRU_GEN_ENABLED
+	bool "Enable Multi-gen LRU by default"
+	depends on LRU_GEN
+	default y
+	help
+	  Enable Multi-gen LRU at boot time by default. The state can still be
+	  toggled at runtime through /sys/kernel/mm/lru_gen/enabled when the
+	  feature is built.
 
 config DEFAULT_MMAP_MIN_ADDR
         int "Low address space to protect from user allocation"
@@ -373,7 +394,7 @@ config NOMMU_INITIAL_TRIM_EXCESS
 	  This option specifies the initial value of this option.  The default
 	  of 1 says that all excess pages should be trimmed.
 
-	  See Documentation/nommu-mmap.txt for more information.
+	  See Documentation/nommu-mmap.txt for more details.
 
 config TRANSPARENT_HUGEPAGE
 	bool "Transparent Hugepage Support"
@@ -415,11 +436,11 @@ choice
 endchoice
 
 config ARCH_WANTS_THP_SWAP
-       def_bool n
+        def_bool n
 
 config THP_SWAP
 	def_bool y
-	depends on TRANSPARENT_HUGEPAGE && ARCH_WANTS_THP_SWAP && SWAP
+depends on TRANSPARENT_HUGEPAGE && ARCH_WANTS_THP_SWAP && SWAP
 	help
 	  Swap transparent huge pages in one piece, without splitting.
 	  XXX: For now, swap cluster backing transparent huge page
@@ -429,7 +450,7 @@ config THP_SWAP
 
 config	TRANSPARENT_HUGE_PAGECACHE
 	def_bool y
-	depends on TRANSPARENT_HUGEPAGE
+depends on TRANSPARENT_HUGEPAGE
 
 #
 # UP and nommu archs use km based percpu allocator
@@ -437,7 +458,7 @@ config	TRANSPARENT_HUGE_PAGECACHE
 config NEED_PER_CPU_KM
 	depends on !SMP
 	bool
-	default y
+default y
 
 config CLEANCACHE
 	bool "Enable cleancache driver to cache clean pages if tmem is present"
